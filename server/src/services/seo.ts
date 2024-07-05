@@ -1,15 +1,14 @@
 import Elysia from "elysia";
 import path from "node:path";
-import type { DB } from "../_worker";
 import type { Env } from "../db/db";
-import { setup } from "../setup";
+import { getEnv } from "../utils/di";
 
-export const SEOService = (db: DB, env: Env) => {
+export function SEOService() {
+    const env: Env = getEnv();
     const endpoint = env.S3_ENDPOINT;
     const accessHost = env.S3_ACCESS_HOST || endpoint;
     const folder = env.S3_CACHE_FOLDER || 'cache/';
     return new Elysia({ aot: false })
-        .use(setup(db, env))
         .get('/seo/*', async ({ set, params, query }) => {
             if (!accessHost) {
                 set.status = 500;

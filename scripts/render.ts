@@ -12,6 +12,7 @@ const secretAccessKey = env.S3_SECRET_ACCESS_KEY;
 const accessHost = env.S3_ACCESS_HOST || endpoint;
 const bucket = env.S3_BUCKET;
 const folder = env.S3_CACHE_FOLDER || 'cache/';
+const forcePathStyle = env.S3_FORCE_PATH_STYLE === "true";
 if (!baseUrl) {
     throw new Error('SEO_BASE_URL is not defined');
 }
@@ -33,6 +34,7 @@ if (!bucket) {
 const s3 = new S3Client({
     region: region,
     endpoint: endpoint,
+    forcePathStyle: forcePathStyle,
     credentials: {
         accessKeyId: accessKeyId,
         secretAccessKey: secretAccessKey
@@ -43,13 +45,13 @@ async function saveFile(filename: string, data: string) {
     // Save data to file
     console.log(`Saving ${filename}`);
     const url = new URL(filename)
-    let fullname = path.join(folder, url.pathname + url.search.replace('?', '&'))
-    if (fullname.endsWith('/')) {
-        fullname += 'index.html';
+    let fileName = path.join(folder, url.pathname + url.search.replace('?', '&'))
+    if (fileName.endsWith('/')) {
+        fileName += 'index.html';
     }
     try {
-        await s3.send(new PutObjectCommand({ Bucket: bucket, Key: fullname, Body: data, ContentType: 'text/html' }))
-        console.info(`Saved ${accessHost}/${fullname}.`)
+        await s3.send(new PutObjectCommand({ Bucket: bucket, Key: fileName, Body: data, ContentType: 'text/html' }))
+        console.info(`Saved ${accessHost}/${fileName}.`)
     } catch (e: any) {
         console.error(e.message)
     }

@@ -3,6 +3,7 @@ name: Deploy
 on:
   push:
     branches:
+      - dev
       - main
   workflow_dispatch:
 
@@ -12,9 +13,9 @@ jobs:
 
     steps:
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 21
+          node-version: 22
 
       - name: Clone Rin repository
         uses: actions/checkout@v4
@@ -43,6 +44,10 @@ jobs:
           S3_ENDPOINT: ${{ vars.S3_ENDPOINT }}
           S3_FOLDER: ${{ vars.S3_FOLDER }}
           S3_REGION: ${{ vars.S3_REGION }}
+          S3_FORCE_PATH_STYLE: ${{ vars.S3_FORCE_PATH_STYLE }}
+          WEBHOOK_URL: ${{ vars.WEBHOOK_URL }}
+          RSS_TITLE: ${{ vars.RSS_TITLE }}
+          RSS_DESCRIPTION: ${{ vars.RSS_DESCRIPTION }}
         run: |
           cd Rin/
           bun i
